@@ -24,6 +24,7 @@
   "build": {
     "appId": "com.pascal.flowchart",
     "productName": "Pascal Блок-схема",
+    "artifactName": "${productName} Setup ${version}-${arch}.${ext}",
     "directories": {
       "output": "dist"
     },
