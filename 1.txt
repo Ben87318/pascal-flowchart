@@ -1,0 +1,82 @@
+program BankAtmSimulation;
+
+var
+  balance: real;       // Баланс счета
+  choice: integer;     // Выбор операции в меню
+  withdrawAmount: real; // Сумма для снятия
+  depositAmount: real;  // Сумма для внесения
+
+begin
+  writeln('--- Добро пожаловать в Электронный Банк ---');
+  balance := 5000.0; // Начальный баланс на карте
+  choice := 0;       // Инициализируем переменную для входа в цикл
+
+  // ЦИКЛ WHILE: Работает до тех пор, пока пользователь не выберет пункт 3 (Выход)
+  while choice <> 3 do
+  begin
+    writeln;
+    writeln('Ваш текущий баланс: ', balance:0:2, ' руб.');
+    writeln('Выберите операцию:');
+    writeln('1. Снять деньги');
+    writeln('2. Внести деньги');
+    writeln('3. Завершить работу и забрать карту');
+    write('Введите номер операции: ');
+    readln(choice);
+    writeln;
+
+    // ВНЕШНЕЕ УСЛОВИЕ 1: Выбрано снятие денег
+    if choice = 1 then
+    begin
+      write('Какую сумму вы хотите снять? ');
+      readln(withdrawAmount);
+
+      // ВНУТРЕННЕЕ УСЛОВИЕ 1.1: Проверяем корректность суммы
+      if withdrawAmount <= 0 then
+      begin
+        writeln('❌ Ошибка: Сумма должна быть больше нуля!');
+      end
+      else
+      begin
+        // ВНУТРЕННЕЕ УСЛОВИЕ 1.2: Проверяем, хватает ли денег на счете
+        if withdrawAmount <= balance then
+        begin
+          balance := balance - withdrawAmount;
+          writeln('✅ Успешно! Возьмите ваши деньги: ', withdrawAmount:0:2, ' руб.');
+        end
+        else
+        begin
+          writeln('❌ Ошибка: Недостаточно средств на счете!');
+        end;
+      end;
+    end
+    
+    // ВНЕШНЕЕ УСЛОВИЕ 2: Выбрано внесение денег
+    else if choice = 2 then
+    begin
+      write('Какую сумму вы хотите положить на счет? ');
+      readln(depositAmount);
+
+      // ВНУТРЕННЕЕ УСЛОВИЕ 2.1: Проверяем корректность суммы внесения
+      if depositAmount > 0 then
+      begin
+        balance := balance + depositAmount;
+        writeln('✅ Успешно! Счет пополнен на ', depositAmount:0:2, ' руб.');
+      end
+      else
+      begin
+        writeln('❌ Ошибка: Нельзя внести отрицательную сумму или ноль!');
+      end;
+    end
+    
+    // ВНЕШНЕЕ УСЛОВИЕ 3: Выбран выход или введен неверный пункт меню
+    else
+    begin
+      if choice = 3 then
+        writeln('👋 Спасибо, что воспользовались нашим банком. До свидания!')
+      else
+        writeln('❌ Ошибка: Неверный пункт меню! Выберите от 1 до 3.');
+    end;
+
+    writeln('--------------------------------------------------');
+  end;
+end.

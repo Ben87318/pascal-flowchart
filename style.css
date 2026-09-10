@@ -1,0 +1,201 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #fff;
+    color: #000;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+.panel {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 16px;
+    background: #f5f5f5;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #333;
+    border-bottom: 1px solid #ccc;
+}
+
+.panel-controls {
+    display: flex;
+    gap: 4px;
+}
+
+.panel-controls button {
+    width: 28px;
+    height: 28px;
+    border: 1px solid #d1d5db;
+    background: #fff;
+    color: #111;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+}
+
+.panel-controls button:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+}
+
+.panel-controls #zoomLabel {
+    min-width: 48px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #374151;
+    background: #fff;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+    user-select: none;
+}
+
+#divider {
+    width: 6px;
+    background: #ccc;
+    cursor: col-resize;
+    transition: background 0.15s;
+    flex-shrink: 0;
+}
+
+#divider:hover,
+#divider.active {
+    background: #000;
+}
+
+#editor-panel {
+    flex: 0 0 20%;
+}
+
+#flowchart-panel {
+    flex: 0 0 80%;
+}
+
+/* CodeMirror белая тема */
+.CodeMirror {
+    height: 100% !important;
+    font-size: 14px;
+    line-height: 1.5;
+    background: #fff;
+    color: #000;
+}
+
+/* Flowchart — как на Visual Paradigm: бесконечная область с сеткой */
+#flowchart-container {
+    flex: 1;
+    overflow: hidden;
+    background: #f3f4f6;
+    background-image: radial-gradient(circle, #d1d5db 1.5px, transparent 1.5px);
+    background-size: 24px 24px;
+    background-position: 0 0;
+    position: relative;
+    padding: 0;
+    cursor: grab;
+}
+
+#flowchart-container:active {
+    cursor: grabbing;
+}
+
+#flowchart-canvas {
+    display: block;
+    background: #ffffff;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+    border-radius: 2px;
+    position: absolute;
+    top: 0; left: 0;
+    transform-origin: 0 0;
+}
+
+/* Scrollbar */
+#flowchart-container{scrollbar-width:thin;scrollbar-color:#999 #f0f0f0;}
+#flowchart-container::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+#flowchart-container::-webkit-scrollbar-track {
+    background: #f0f0f0;
+}
+
+#flowchart-container::-webkit-scrollbar-thumb {
+    background: #999;
+}
+
+#flowchart-container::-webkit-scrollbar-thumb:hover {
+    background: #666;
+}
+
+/* Error display */
+.error-overlay {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    background: #fff;
+    color: #1a1a1a;
+    padding: 14px 18px;
+    font-size: 0.9rem;
+    display: none;
+    z-index: 10;
+    border-left: 4px solid #d32f2f;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+    border-radius: 4px;
+    align-items: center;
+    gap: 12px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.error-overlay.visible {
+    display: flex;
+}
+
+.error-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: #d32f2f;
+    color: #fff;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
+
+.error-text {
+    line-height: 1.4;
+}
