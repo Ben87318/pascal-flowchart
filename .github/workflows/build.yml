@@ -14,8 +14,8 @@ jobs:
         with:
           node-version: 20
       - run: npm install
-      - run: npm run dist:win64
-      - run: npm run dist:win32
+      - run: npx electron-builder --win nsis --x64 --publish never --config.win.signAndEditExecutable=false
+      - run: npx electron-builder --win nsis --ia32 --publish never --config.win.signAndEditExecutable=false
       - uses: actions/upload-artifact@v4
         with:
           name: windows
@@ -31,7 +31,7 @@ jobs:
         with:
           node-version: 20
       - run: npm install
-      - run: npx electron-builder --linux AppImage deb --x64
+      - run: npx electron-builder --linux AppImage deb --x64 --publish never
       - uses: actions/upload-artifact@v4
         with:
           name: linux
@@ -48,7 +48,7 @@ jobs:
         with:
           node-version: 20
       - run: npm install
-      - run: npx electron-builder --mac dmg --x64
+      - run: npx electron-builder --mac dmg --x64 --publish never
       - uses: actions/upload-artifact@v4
         with:
           name: macos
