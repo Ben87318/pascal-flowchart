@@ -87,6 +87,21 @@ function createWindow() {
         console.log('[RENDERER] Page loaded successfully');
     });
 
+    // Меню по правой кнопке мыши для полей ввода (копировать/вставить)
+    mainWindow.webContents.on('context-menu', (event, params) => {
+        if (params.isEditable) {
+            const { editFlags } = params;
+            const menu = Menu.buildFromTemplate([
+                { label: 'Вырезать', role: 'cut', enabled: editFlags.canCut },
+                { label: 'Копировать', role: 'copy', enabled: editFlags.canCopy },
+                { label: 'Вставить', role: 'paste', enabled: editFlags.canPaste },
+                { type: 'separator' },
+                { label: 'Выбрать всё', role: 'selectAll', enabled: editFlags.canSelectAll },
+            ]);
+            menu.popup();
+        }
+    });
+
     mainWindow.webContents.on('crashed', () => {
         console.error('[RENDERER] Renderer process crashed!');
     });

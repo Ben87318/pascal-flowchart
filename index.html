@@ -3,12 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' http://127.0.0.1:54321 http://localhost:54321 https://*.supabase.co wss://*.supabase.co;">
     <title>Pascal → Блок-схема</title>
     <link rel="stylesheet" href="lib/codemirror/codemirror.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <header id="topbar">
+        <div class="brand">Pascal → Блок-схема <span id="cloud-dot" class="dot off" title="Нет соединения с базой"></span></div>
+        <div id="auth-logged-out" class="auth-block">
+            <button id="btnOpenAuth">Войти / Регистрация</button>
+        </div>
+        <div id="auth-logged-in" class="auth-block" hidden>
+            <span id="userBadge" class="user-badge"></span>
+            <button id="btnLogout" class="ghost">Выйти</button>
+        </div>
+    </header>
+    <div id="cloudbar">
+        <button id="btnMenu" class="burger" title="Группы и задания">☰</button>
+        <input id="projTitle" type="text" placeholder="Название схемы" disabled>
+        <button id="btnSaveCloud" disabled>💾 В облако</button>
+        <button id="btnNewCloud" class="ghost" disabled>Новое</button>
+        <select id="projList" disabled><option value="">— мои схемы —</option></select>
+        <button id="btnReloadCloud" class="ghost" disabled title="Обновить список">↻</button>
+        <button id="btnDeleteCloud" class="ghost danger" disabled>Удалить</button>
+        <span id="cloudStatus" class="cloud-status">Войдите, чтобы сохранять схемы в базу</span>
+    </div>
+    <div id="menu-overlay" class="menu-overlay" hidden>
+        <div class="menu-drawer">
+            <button id="menuClose" class="modal-close" title="Закрыть">×</button>
+            <h3>Группы и задания</h3>
+            <span id="roleBadge" class="role-badge">роль: —</span>
+            <label class="menu-label">Моя группа</label>
+            <div id="groupList" class="pick-list"><div class="pick-empty">Войдите, чтобы увидеть группы</div></div>
+            <input id="groupName" type="text" placeholder="Новая группа / войти по названию">
+            <div class="menu-row">
+                <button id="btnCreateGroup" class="ghost" disabled>Создать группу (учитель)</button>
+                <button id="btnJoinGroup" class="ghost" disabled>Войти в группу (ученик)</button>
+            </div>
+            <label class="menu-label">Участники</label>
+            <div id="memberList" class="pick-list"><div class="pick-empty">Выберите группу</div></div>
+            <label class="menu-label">Задания</label>
+            <div id="assignList" class="pick-list"><div class="pick-empty">Выберите группу</div></div>
+            <div class="menu-row">
+                <button id="btnNewAssign" class="ghost" disabled>Дать задание (учитель)</button>
+                <button id="btnSubmitAssign" class="ghost" disabled>Сдать решение (ученик)</button>
+            </div>
+            <label class="menu-label">Сдачи (учитель)</label>
+            <div id="subList" class="pick-list"><div class="pick-empty">Выберите задание</div></div>
+            <!-- скрытые селекты для совместимости логики -->
+            <select id="groupSelect" hidden><option value="">— моя группа —</option></select>
+            <select id="assignSelect" hidden><option value="">— задания —</option></select>
+        </div>
+    </div>
+    <div id="group-modal" class="modal-overlay" hidden>
+        <div class="modal-card">
+            <button id="gClose" class="modal-close" title="Закрыть">×</button>
+            <h2>Новая группа</h2>
+            <p class="modal-sub">Ученики найдут её по названию и войдут сами</p>
+            <input id="gName" type="text" placeholder="Название группы, например ИП-301">
+            <div id="gError" class="modal-error"></div>
+            <button id="gSubmit">Создать группу</button>
+        </div>
+    </div>
+    <div id="assign-modal" class="modal-overlay" hidden>
+        <div class="modal-card modal-wide">
+            <button id="aClose" class="modal-close" title="Закрыть">×</button>
+            <h2>Новое задание</h2>
+            <p class="modal-sub" id="aGroupHint">Группа: —</p>
+            <input id="aTitle" type="text" placeholder="Название задания">
+            <label class="menu-label">Сдать до (необязательно)</label>
+            <input id="aDue" type="datetime-local">
+            <textarea id="aTask" placeholder="Текст / код задания — ученик сможет открыть его в редакторе"></textarea>
+            <label class="menu-label">Фото задания (необязательно)</label>
+            <input id="aImage" type="file" accept="image/*">
+            <img id="aImagePreview" class="assign-preview" hidden alt="Фото задания">
+            <div id="aError" class="modal-error"></div>
+            <button id="aSubmit">Опубликовать задание</button>
+        </div>
+    </div>
+    <div id="toast-box" class="toast-box"></div>
+    <div id="sub-modal" class="modal-overlay" hidden>
+        <div class="modal-card modal-wide">
+            <button id="sClose" class="modal-close" title="Закрыть">×</button>
+            <h2 id="sTitle">Сдача</h2>
+            <p class="modal-sub" id="sWho">—</p>
+            <pre id="sCode" class="code-view"></pre>
+            <input id="sFeedback" type="text" placeholder="Комментарий ученику (необязательно)">
+            <div class="menu-row">
+                <button id="sOpen" class="ghost">Открыть в редакторе</button>
+                <input id="sGrade" type="text" placeholder="оценка" class="sub-grade">
+                <button id="sSaveGrade">Оценить</button>
+            </div>
+        </div>
+    </div>
     <main>
         <div class="panel" id="editor-panel">
             <div class="panel-header">
@@ -34,5 +122,21 @@
     <script src="lib/codemirror/codemirror.min.js"></script>
     <script src="lib/codemirror/pascal.min.js"></script>
     <script type="module" src="app.js"></script>
+    <div id="auth-modal" class="modal-overlay" hidden>
+        <div class="modal-card">
+            <button id="mClose" class="modal-close" title="Закрыть">×</button>
+            <h2>Вход в аккаунт</h2>
+            <p class="modal-sub">Ученик входит или регистрируется сам. Учителю логин выдает администратор.</p>
+            <div class="modal-tabs">
+                <button id="tabLogin" class="active">Вход</button>
+                <button id="tabRegister">Регистрация ученика</button>
+            </div>
+            <input id="mEmail" type="email" placeholder="email, например name@example.com" autocomplete="username">
+            <input id="mPass" type="password" placeholder="пароль (минимум 6 символов)" autocomplete="current-password">
+            <div id="mError" class="modal-error"></div>
+            <button id="mSubmit">Войти</button>
+            <button id="mSkip" class="ghost">Продолжить без входа (офлайн)</button>
+        </div>
+    </div>
 </body>
 </html>
